@@ -49,8 +49,7 @@ public class EchoDialog : IDialog<object>
                 context,
                 AfterSetMaximumAsync,
                 "Give a positive integer",
-                "Didn't get that!",
-                promptStyle: PromptStyle.Auto);
+                "Didn't get that!");
             
         }
         else
@@ -82,7 +81,7 @@ public class EchoDialog : IDialog<object>
 
         if (maxNum is long)
         {
-            this.answer = rnd.Next(1, maxNum+1) ;
+            this.answer = rnd.Next(1, (int) maxNum+1) ;
             await context.PostAsync("Random number: "+this.answer);
         }
         else
