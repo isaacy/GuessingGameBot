@@ -11,6 +11,7 @@ public class EchoDialog : IDialog<object>
     protected int numOfGuess;
     protected int numOfGames = 0;
     protected long answer;
+    protected Random rnd = new Random();
 
     public Task StartAsync(IDialogContext context)
     {
@@ -81,7 +82,7 @@ public class EchoDialog : IDialog<object>
 
         if (maxNum is long)
         {
-            this.answer = (long) Random.Sample() * (maxNum +1) ;
+            this.answer = rnd.Next(1, maxNum+1) ;
             await context.PostAsync("Random number: "+this.answer);
         }
         else
