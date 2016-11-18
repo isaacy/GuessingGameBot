@@ -1,4 +1,5 @@
 {
+  "locked": false,
   "version": 2,
   "targets": {
     ".NETFramework,Version=v4.6": {
@@ -35,7 +36,7 @@
           "lib/net45/System.Net.Http.Formatting.dll": {}
         }
       },
-      "Microsoft.AspNet.WebApi.Core/5.2.3": {
+      "Microsoft.AspNet.WebAPI.Core/5.2.3": {
         "type": "package",
         "dependencies": {
           "Microsoft.AspNet.WebApi.Client": "5.2.3"
@@ -401,16 +402,16 @@
         "microsoft.aspnet.webapi.client.nuspec"
       ]
     },
-    "Microsoft.AspNet.WebApi.Core/5.2.3": {
+    "Microsoft.AspNet.WebAPI.Core/5.2.3": {
       "sha512": "o90QYlRV8VKR1S7+EcJw9w8WSyVFLl+IIzN8ILZ+n2t6rsc/KS8kBxRzA7wCFPRUHhebCfLqilBk39phvanx3g==",
       "type": "package",
-      "path": "microsoft.aspnet.webapi.core/5.2.3",
+      "path": "Microsoft.AspNet.WebAPI.Core/5.2.3",
       "files": [
         "Content/web.config.transform",
+        "Microsoft.AspNet.WebAPI.Core.5.2.3.nupkg.sha512",
+        "Microsoft.AspNet.WebAPI.Core.nuspec",
         "lib/net45/System.Web.Http.dll",
-        "lib/net45/System.Web.Http.xml",
-        "microsoft.aspnet.webapi.core.5.2.3.nupkg.sha512",
-        "microsoft.aspnet.webapi.core.nuspec"
+        "lib/net45/System.Web.Http.xml"
       ]
     },
     "Microsoft.Azure.KeyVault.Core/1.0.0": {
@@ -759,8 +760,5 @@
     ]
   },
   "tools": {},
-  "projectFileToolGroups": {},
-  "packageFolders": {
-    "D:\\home\\data\\Functions\\packages\\nuget": {}
-  }
+  "projectFileToolGroups": {}
 }
