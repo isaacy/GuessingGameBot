@@ -1,3 +1,5 @@
+#load "GuessingGame.csx"
+
 using System;
 using System.Threading.Tasks;
 using Microsoft.Bot.Builder.Dialogs;
@@ -7,7 +9,8 @@ using Microsoft.Bot.Connector;
 [Serializable]
 public class EchoDialog : IDialog<object>
 {
-    //protected GuessingGame game;
+    
+    protected List<GuessingGame> games = new List<GuessingGame>();
 
     public Task StartAsync(IDialogContext context)
     {
@@ -31,14 +34,15 @@ public class EchoDialog : IDialog<object>
     {
         var message = await argument;
         //await context.PostAsync($"{this.count++}: You said {message.Text}");
-        await context.PostAsync("Welcome to the Guessing Game bot");
+        await context.PostAsync($"Welcome to the Guessing Game bot, {message.From.Name}");
 
+   
         PromptDialog.Number(
             context,
             AfterSetMaximumAsync,
             "Give a positive integer",
             "Didn't get that!");
-       
+   
 
     }
 
@@ -61,62 +65,53 @@ public class EchoDialog : IDialog<object>
     public async Task AfterSetMaximumAsync(IDialogContext context, IAwaitable<long> argument)
     {
         var maxNum = await argument;
-        await context.PostAsync("HAHAHA.");
-        if (maxNum is long)
-        {
-            
-            await context.PostAsync("Now please guess the number");
-            // game = new GuessingGame((int) maxNum);
 
-            PromptDialog.Number(
-                context,
-                AfterSetMaximumAsync,
-                "Give a positive integer",
-                "Didn't get that!");
-        }
-        else
-        {
-            await context.PostAsync("Please input an integer.");
-            context.Wait(MessageReceivedAsync);
-        }
+        //await context.PostAsync("Now please guess the number");
+        games.Add(new GuessingGame((int) maxNum));
+
+        PromptDialog.Number(
+            context,
+            AfterGuessAsync,
+            "Now please make a guess of the number...",
+            "Didn't get that!");
+        
     }
 
-    /*
+
     public async Task AfterGuessAsync(IDialogContext context, IAwaitable<long> argument)
     {
         var guess = await argument;
 
-        if (guess is long)
-        {
-            Result result = game.Guess((int) guess);
-            if (result == Result.Correct)
-            {
-                await context.PostAsync("You have guessed the right number!");
-                context.Wait(MessageReceivedAsync);
+        Result result = games.Last().Guess((int) guess);
 
-            }
-            else if (result == Result.TooHigh)
-            {
-                await context.PostAsync("Guess is too high");
-                context.Wait(AfterGuessAsync);
-            }
-            else if (result == Result.TooLow)
-            {
-                await context.PostAsync("Guess is too low");
-                context.Wait(AfterGuessAsync);
-            }
-            else
-            {
-                await context.PostAsync("You're a quitter...");
-                context.Wait(MessageReceivedAsync);
-            }
+        if (result == Result.Correct)
+        {
+            await context.PostAsync("You have guessed the right number!");
+            context.Wait(MessageReceivedAsync);
+
+        }
+        else if (result == Result.TooHigh)
+        {
+            PromptDialog.Number(
+                context,
+                AfterGuessAsync,
+                "Guess is too high... try again",
+                "Didn't get that!");
+        }
+        else if (result == Result.TooLow)
+        {
+            PromptDialog.Number(
+                context,
+                AfterGuessAsync,
+                "Guess is too low... try again",
+                "Didn't get that!");
         }
         else
         {
-            await context.PostAsync("Please input an integer.");
-            context.Wait(AfterGuessAsync);
+            await context.PostAsync("You're a quitter...");
+            context.Wait(MessageReceivedAsync);
         }
+
     }
-    */
-    
+
 }
