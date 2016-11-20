@@ -24,7 +24,7 @@ public class GuessingGame
             IsWin = true;
             return Result.Correct;
         }
-        else if (answer < 0)
+        else if (guess < 0)
         {
             return Result.Quit;
         }

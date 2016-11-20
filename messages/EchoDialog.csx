@@ -1,6 +1,7 @@
 #load "GuessingGame.csx"
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Connector;
@@ -34,34 +35,88 @@ public class EchoDialog : IDialog<object>
     {
         var message = await argument;
         //await context.PostAsync($"{this.count++}: You said {message.Text}");
-        await context.PostAsync($"Welcome to the Guessing Game bot, {message.From.Name}");
+        await context.PostAsync($"Hello, {message.From.Name}");
 
-   
-        PromptDialog.Number(
+        ShowStartMenu(context);
+       
+    }
+
+    private void ShowStartMenu(IDialogContext context)
+    {
+        String[] options =
+        {
+            "restart",
+            "report",
+            "clearhistory"
+        };
+
+        String[] optionsDescriptions =
+        {
+            "Start a new game",
+            "Report my stat",
+            "Clear my history"
+        };
+
+        PromptDialog.Choice(
             context,
-            AfterSetMaximumAsync,
-            "Give a positive integer",
-            "Didn't get that!");
-   
+            AfterStartMenuSelectedAsync,
+            options,
+            "Welcome to the Guessing Game bot",
+            "Please select from one of the options",
+            3,
+            PromptStyle.Auto,
+            optionsDescriptions);
+    }
+
+    public async Task AfterStartMenuSelectedAsync(IDialogContext context, IAwaitable<String> argument)
+    {
+        var selectedChoice = await argument;
+
+        if (selectedChoice == "restart")
+        {
+            PromptDialog.Number(
+                context,
+                AfterSetMaximumAsync,
+                "How large do you want your guess to be? Give me a positive integer number!",
+                "Didn't get that!");
+        }
+        else if (selectedChoice == "report")
+        {
+            await ReportStat(context);
+            ShowStartMenu(context);
+        }
+        else if (selectedChoice == "clearhistory")
+        {
+            games.Clear();
+            await context.PostAsync("All game history cleared");
+            ShowStartMenu(context);
+        }
+        else
+        {
+            ShowStartMenu(context);
+        }
+    }
+
+    private async Task ReportStat(IDialogContext context)
+    {
+        await context.PostAsync($"Total games played: {games.Count()}!");
+
+        var winningGuesses = from g in games
+                             where g.IsWin
+                             select g.NumOfGuess;
+
+        if (winningGuesses.Any())
+        {
+            await context.PostAsync($"Average number of guesses: { ((double) winningGuesses.Sum() / winningGuesses.Count())}");
+            await context.PostAsync($"Lowest number of guess: { winningGuesses.Min()}");
+        }
+        else
+        {
+            await context.PostAsync($"You haven't won a single game though....");
+        }
 
     }
 
-    // public async Task AfterResetAsync(IDialogContext context, IAwaitable<bool> argument)
-    // {
-    //     var confirm = await argument;
-    //     if (confirm)
-    //     {
-    //         this.count = 1;
-    //         await context.PostAsync("Reset count.");
-    //     }
-    //     else
-    //     {
-    //         await context.PostAsync("Did not reset count.");
-    //     }
-    //     context.Wait(MessageReceivedAsync);
-    // }
-    
-    
     public async Task AfterSetMaximumAsync(IDialogContext context, IAwaitable<long> argument)
     {
         var maxNum = await argument;
@@ -77,17 +132,45 @@ public class EchoDialog : IDialog<object>
         
     }
 
+    public async Task AfterFinishGameAsync(IDialogContext context, IAwaitable<bool> argument)
+    {
+        var confirm = await argument;
+
+        if (confirm)
+        {
+            PromptDialog.Number(
+                context,
+                AfterSetMaximumAsync,
+                "How large do you want your guess to be? Give me a positive integer number!",
+                "Didn't get that!");
+        }
+        else
+        {
+            await ReportStat(context);
+            ShowStartMenu(context);
+        }
+    }
 
     public async Task AfterGuessAsync(IDialogContext context, IAwaitable<long> argument)
     {
         var guess = await argument;
-
-        Result result = games.Last().Guess((int) guess);
+        var currentGame = games.Last();
+        Result result = currentGame.Guess((int) guess);
 
         if (result == Result.Correct)
         {
             await context.PostAsync("You have guessed the right number!");
-            context.Wait(MessageReceivedAsync);
+            await context.PostAsync($"You made {currentGame.NumOfGuess} guess in this round");
+
+            PromptDialog.Confirm(
+                context,
+                AfterFinishGameAsync,
+                "Do you want play another game?",
+                "Didn't get that!",
+                3,
+                PromptStyle.Auto);
+
+            //TODO: ask if they want to play again.
 
         }
         else if (result == Result.TooHigh)
@@ -109,7 +192,13 @@ public class EchoDialog : IDialog<object>
         else
         {
             await context.PostAsync("You're a quitter...");
-            context.Wait(MessageReceivedAsync);
+            PromptDialog.Confirm(
+                context,
+                AfterFinishGameAsync,
+                "Do you want play another game?",
+                "Didn't get that!",
+                3,
+                PromptStyle.Auto);
         }
 
     }
