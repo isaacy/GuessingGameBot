@@ -7,11 +7,7 @@ using Microsoft.Bot.Connector;
 [Serializable]
 public class EchoDialog : IDialog<object>
 {
-    protected int count = 1;
-    protected int numOfGuess;
-    protected int numOfGames = 0;
-    protected long answer;
-    protected GuessingGame game;
+    //protected GuessingGame game;
 
     public Task StartAsync(IDialogContext context)
     {
@@ -35,12 +31,15 @@ public class EchoDialog : IDialog<object>
     {
         var message = await argument;
         //await context.PostAsync($"{this.count++}: You said {message.Text}");
-        context.PostAsync("Welcome to the Guessing Game bot");
+        await context.PostAsync("Welcome to the Guessing Game bot");
+
         PromptDialog.Number(
             context,
             AfterSetMaximumAsync,
             "Give a positive integer",
             "Didn't get that!");
+       
+
     }
 
     // public async Task AfterResetAsync(IDialogContext context, IAwaitable<bool> argument)
@@ -62,27 +61,27 @@ public class EchoDialog : IDialog<object>
     public async Task AfterSetMaximumAsync(IDialogContext context, IAwaitable<long> argument)
     {
         var maxNum = await argument;
-
+        await context.PostAsync("HAHAHA.");
         if (maxNum is long)
         {
             
             await context.PostAsync("Now please guess the number");
-            game = new GuessingGame((int) maxNum);
+            // game = new GuessingGame((int) maxNum);
 
             PromptDialog.Number(
                 context,
-                AfterGuessAsync,
+                AfterSetMaximumAsync,
                 "Give a positive integer",
                 "Didn't get that!");
         }
         else
         {
             await context.PostAsync("Please input an integer.");
+            context.Wait(MessageReceivedAsync);
         }
-        
-        context.Wait(MessageReceivedAsync);
     }
 
+    /*
     public async Task AfterGuessAsync(IDialogContext context, IAwaitable<long> argument)
     {
         var guess = await argument;
@@ -118,4 +117,6 @@ public class EchoDialog : IDialog<object>
             context.Wait(AfterGuessAsync);
         }
     }
+    */
+    
 }
