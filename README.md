@@ -14,4 +14,4 @@ Write a program to play a guessing game:
 - If they don't want to play again, print:
   - Number of games were played, the average number of guesses, and the lowest number of guesses results in a correct guesses.
 
-Copyright 2015 Isaac Yuen
+Copyright 2016 Isaac Yuen

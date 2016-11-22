@@ -99,7 +99,7 @@ public class EchoDialog : IDialog<object>
 
     private async Task ReportStat(IDialogContext context)
     {
-        await context.PostAsync($"Total games played: {games.Count()}!");
+        
 
         var winningGuesses = from g in games
                              where g.IsWin
@@ -107,11 +107,12 @@ public class EchoDialog : IDialog<object>
 
         if (winningGuesses.Any())
         {
-            await context.PostAsync($"Average number of guesses: { ((double) winningGuesses.Sum() / winningGuesses.Count())}");
-            await context.PostAsync($"Lowest number of guess: { winningGuesses.Min()}");
+            await context.PostAsync($"Your history\nTotal games played: {games.Count()}!");
+            await context.PostAsync($"Average number of guesses: { ((double) winningGuesses.Sum() / winningGuesses.Count())}\nLowest number of guess: { winningGuesses.Min()}");
         }
         else
         {
+            await context.PostAsync($"Your history\nTotal games played: {games.Count()}!");
             await context.PostAsync($"You haven't won a single game though....");
         }
 
@@ -159,8 +160,8 @@ public class EchoDialog : IDialog<object>
 
         if (result == Result.Correct)
         {
-            await context.PostAsync("You have guessed the right number!");
-            await context.PostAsync($"You made {currentGame.NumOfGuess} guess in this round");
+            await context.PostAsync($"You have guessed the right number!\n You made {currentGame.NumOfGuess} guess in this round");
+          
 
             PromptDialog.Confirm(
                 context,
