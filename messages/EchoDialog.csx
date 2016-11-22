@@ -107,7 +107,7 @@ public class EchoDialog : IDialog<object>
 
         if (winningGuesses.Any())
         {
-            await context.PostAsync($"Your history\nTotal games played: {games.Count()}!");
+            await context.PostAsync($"Your history:\nTotal games played: {games.Count()}!");
             await context.PostAsync($"Average number of guesses: { ((double) winningGuesses.Sum() / winningGuesses.Count())}\nLowest number of guess: { winningGuesses.Min()}");
         }
         else
